@@ -1,0 +1,63 @@
+<resources>
+    <string name="app_name">EParking</string>
+    <string name="username_email">Username / Email</string>
+    <string name="btn_login">LOGIN</string>
+    <string name="plat_nomor">Plat Nomor</string>
+    <string-array name="plat_nomor">
+        <item>BL</item>
+        <item>BB</item>
+        <item>BK</item>
+        <item>BA</item>
+        <item>BM</item>
+        <item>BH</item>
+        <item>BD</item>
+        <item>BP</item>
+        <item>BG</item>
+        <item>BN</item>
+        <item>BE</item>
+        <item>A</item>
+        <item>B</item>
+        <item>D</item>
+        <item>E</item>
+        <item>F</item>
+        <item>T</item>
+        <item>Z</item>
+        <item>G</item>
+        <item>H</item>
+        <item>K</item>
+        <item>R</item>
+        <item>AA</item>
+        <item>AB</item>
+        <item>AD</item>
+        <item>L</item>
+        <item>M</item>
+        <item>N</item>
+        <item>P</item>
+        <item>S</item>
+        <item>W</item>
+        <item>AW</item>
+        <item>AG</item>
+        <item>DK</item>
+        <item>DR</item>
+        <item>EA</item>
+        <item>DH</item>
+        <item>EB</item>
+        <item>ED</item>
+        <item>KB</item>
+        <item>DK</item>
+        <item>KH</item>
+        <item>KT</item>
+        <item>KU</item>
+        <item>DB</item>
+        <item>DL</item>
+        <item>DM</item>
+        <item>DN</item>
+        <item>DT</item>
+        <item>DD</item>
+        <item>DC</item>
+        <item>DE</item>
+        <item>DG</item>
+        <item>PA</item>
+        <item>PB</item>
+    </string-array>
+</resources>
