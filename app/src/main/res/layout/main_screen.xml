@@ -125,15 +125,18 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
                     <androidx.appcompat.widget.AppCompatButton
+                        style="@style/Widget.MaterialComponents.Button"
                         android:layout_weight="0.5"
                         android:id="@+id/btnMasuk"
-                        android:text="Kendaraan Masuk"
+                        android:text="Kendaraan\nMasuk"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>
                     <androidx.appcompat.widget.AppCompatButton
+                        android:visibility="gone"
+                        style="@style/Widget.MaterialComponents.Button"
                         android:layout_weight="0.5"
                         android:id="@+id/btnKeluar"
-                        android:text="Kendaraan Keluar"
+                        android:text="Kendaraan\nKeluar"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>
                 </LinearLayout>

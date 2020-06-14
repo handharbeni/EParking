@@ -2,6 +2,7 @@ package mhandharbeni.eparking.database.interfaces;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
+import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 
@@ -30,4 +31,14 @@ public interface InterfaceKendaraan {
 
     @Query("SELECT * FROM Kendaraan WHERE platNo = :platNo AND tiketNo = :tiketNo")
     List<Kendaraan> getKendaraan(String platNo, String tiketNo);
+
+    @Query("SELECT * FROM Kendaraan WHERE platNo = :platNo OR tiketNo = :tiketNo")
+    List<Kendaraan> checkDuplicateKendaraan(String platNo, String tiketNo);
+
+
+    @Query("DELETE FROM kendaraan")
+    void deleteAll();
+
+    @Delete
+    void delete(Kendaraan kendaraan);
 }

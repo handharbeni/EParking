@@ -15,6 +15,7 @@ import android.widget.TextView;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -27,13 +28,14 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import mhandharbeni.eparking.adapters.KendaraanAdapter;
 import mhandharbeni.eparking.database.models.response.Kendaraan;
+import mhandharbeni.eparking.fragments.DetailFragments;
 import mhandharbeni.eparking.presenter.MainPresenter;
 import mhandharbeni.eparking.utilitas.AppPreferences;
 import mhandharbeni.eparking.utilitas.BaseActivity;
 import mhandharbeni.eparking.utilitas.Constant;
 import mhandharbeni.eparking.view.MainUIView;
 
-public class MainActivity extends BaseActivity implements MainUIView, KendaraanAdapter.KendaraanInterface {
+public class MainActivity extends BaseActivity implements MainUIView, KendaraanAdapter.KendaraanInterface, DetailFragments.DetailFragmentCallback {
     String TAG = MainActivity.class.getSimpleName();
 
     @BindView(R.id.loginScreen) ConstraintLayout loginLayout;
@@ -49,11 +51,11 @@ public class MainActivity extends BaseActivity implements MainUIView, KendaraanA
     @BindView(R.id.platNo) TextInputLayout platNo;
     @BindView(R.id.tiketNo) TextInputLayout tiketNo;
     @BindView(R.id.btnMasuk) AppCompatButton btnMasuk;
-    @BindView(R.id.btnKeluar) AppCompatButton btnKeluar;
 
     @BindView(R.id.listKendaraan)RecyclerView listKendaraan;
     KendaraanAdapter kendaraanAdapter;
     LinearLayoutManager linearLayoutManager;
+    GridLayoutManager gridLayoutManager;
 
 
     MainPresenter mainPresenter;
@@ -87,21 +89,20 @@ public class MainActivity extends BaseActivity implements MainUIView, KendaraanA
 
     @OnClick(R.id.btnMasuk)
     public void clickBtnMasuk(){
-        Kendaraan kendaraan = new Kendaraan();
-        kendaraan.setPlatNo(platNo.getEditText().getText().toString());
-        kendaraan.setTiketNo(tiketNo.getEditText().getText().toString());
-        kendaraan.setDateNow(System.currentTimeMillis());
-        kendaraan.setTimeIn(System.currentTimeMillis());
-
-        mainPresenter.kendaraanMasuk(kendaraan);
+        mainPresenter.validateKendaraanInput(
+                platNo.getEditText(),
+                tiketNo.getEditText(),
+                Constant.STATE_VALIDATED_MASUK
+        );
     }
 
     @Override
     public void listDataKendaraan(List<Kendaraan> kendaraanList) {
         linearLayoutManager = new LinearLayoutManager(getApplicationContext());
+        gridLayoutManager = new GridLayoutManager(getApplicationContext(), 3);
         kendaraanAdapter = new KendaraanAdapter(kendaraanList, getApplicationContext(), this);
 
-        listKendaraan.setLayoutManager(linearLayoutManager);
+        listKendaraan.setLayoutManager(gridLayoutManager);
         listKendaraan.setAdapter(kendaraanAdapter);
 
         listKendaraan.scrollToPosition(kendaraanList.size() - 1);
@@ -202,8 +203,33 @@ public class MainActivity extends BaseActivity implements MainUIView, KendaraanA
     }
 
     @Override
+    public void validated(int state) {
+        switch (state){
+            case Constant.STATE_VALIDATED_MASUK :
+                Kendaraan kendaraan = new Kendaraan();
+                kendaraan.setPlatNo(platNo.getEditText().getText().toString());
+                kendaraan.setTiketNo(tiketNo.getEditText().getText().toString());
+                kendaraan.setDateNow(System.currentTimeMillis());
+                kendaraan.setTimeIn(System.currentTimeMillis());
+
+                mainPresenter.kendaraanMasuk(kendaraan);
+                break;
+            case Constant.STATE_VALIDATED_KELUAR :
+                break;
+        }
+    }
+
+    @Override
     public void onKendaraanClick(Kendaraan kendaraan) {
         platNo.getEditText().setText(kendaraan.getPlatNo());
         tiketNo.getEditText().setText(kendaraan.getTiketNo());
+
+        DetailFragments detailFragments = new DetailFragments(this, kendaraan, this);
+        detailFragments.show(getSupportFragmentManager(), detailFragments.getTag());
+    }
+
+    @Override
+    public void onKeluarClicked(Kendaraan kendaraan) {
+
     }
 }

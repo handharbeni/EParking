@@ -38,7 +38,7 @@ public abstract class AppDB extends RoomDatabase {
                             Constant.nameDb
                     )
                             .allowMainThreadQueries()
-                            .addMigrations(migrations)
+                            .fallbackToDestructiveMigration()
                             .build();
                 }
             }

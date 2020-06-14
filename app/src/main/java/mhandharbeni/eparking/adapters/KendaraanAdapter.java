@@ -17,6 +17,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import mhandharbeni.eparking.R;
 import mhandharbeni.eparking.database.models.response.Kendaraan;
+import mhandharbeni.eparking.utilitas.Utils;
 
 public class KendaraanAdapter extends RecyclerView.Adapter<KendaraanAdapter.ViewHolder> {
     List<Kendaraan> listKendaraan;
@@ -66,43 +67,19 @@ public class KendaraanAdapter extends RecyclerView.Adapter<KendaraanAdapter.View
                 txtItemPlatNo.setText(kendaraan.getPlatNo());
                 txtItemTiketNo.setText(kendaraan.getTiketNo());
 
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTimeInMillis(kendaraan.getDateNow()!=null?kendaraan.getDateNow():
-                        System.currentTimeMillis());
-
-                int mYear = calendar.get(Calendar.YEAR);
-                int mMonth = calendar.get(Calendar.MONTH);
-                int mDay = calendar.get(Calendar.DAY_OF_MONTH);
-
                 txtItemDate.setText(
                         String.format(
-                                "%s/%s/%s",
-                                String.valueOf(mDay),
-                                String.valueOf(mMonth),
-                                String.valueOf(mYear)
+                                "%s",
+                                Utils.getDateFromMillis(kendaraan.getDateNow())
                         )
                 );
 
-                Calendar calendarIn = Calendar.getInstance();
-                calendarIn.setTimeInMillis(kendaraan.getTimeIn()!=null?kendaraan.getTimeIn():
-                        System.currentTimeMillis());
-                int hourIn = calendarIn.get(Calendar.HOUR);
-                int minuteIn = calendarIn.get(Calendar.MINUTE);
-
                 txtItemJamMasuk.setText(
-                        String.format("%s:%s", String.valueOf(hourIn), String.valueOf(minuteIn))
+                        String.format("%s", Utils.getTimeFromMillis(kendaraan.getTimeIn()))
                 );
 
-
-                Calendar calendarOut = Calendar.getInstance();
-                calendarOut.setTimeInMillis(kendaraan.getTimeOut()!=null?kendaraan.getTimeOut():
-                        System.currentTimeMillis());
-
-                int hourOut = calendarOut.get(Calendar.HOUR);
-                int minuteOut = calendarOut.get(Calendar.MINUTE);
-
                 txtItemJamKeluar.setText(
-                        String.format("%s:%s", String.valueOf(hourOut), String.valueOf(minuteOut))
+                        String.format("%s", Utils.getTimeFromMillis(kendaraan.getTimeOut()))
                 );
             } catch (NullPointerException ignored){
 

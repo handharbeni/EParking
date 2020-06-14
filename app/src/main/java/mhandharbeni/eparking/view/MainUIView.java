@@ -29,4 +29,5 @@ public interface MainUIView extends UiView {
     void permissionDenied();
 
     void showError(EditText editText, String message);
+    void validated(int state);
 }

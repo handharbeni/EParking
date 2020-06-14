@@ -2,16 +2,11 @@ package mhandharbeni.eparking.presenter;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.Context;
-import android.content.pm.PackageManager;
 import android.os.CountDownTimer;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.EditText;
 
-import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.Observer;
 
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
@@ -101,12 +96,13 @@ public class MainPresenter extends BasePresenter<MainUIView> {
         AppPreferences.getInstance(activity.getApplicationContext()).setPref(Constant.STATE_LOGIN
                 , false);
 
+        AppDB.getInstance(activity.getApplicationContext()).kendaraan().deleteAll();
+
         getMvpView().logoutSukses();
     }
 
     public void switchScreen(){
         boolean loginState = AppPreferences.getInstance(activity.getApplicationContext()).getPref(Constant.STATE_LOGIN, false);
-        Log.d(TAG, "countDown onFinish: "+loginState);
         if (loginState){
             getMvpView().showMainPage(
                     AppPreferences.getInstance(activity.getApplicationContext()).getPref(Constant.USERNAME, "notset"),
@@ -143,13 +139,8 @@ public class MainPresenter extends BasePresenter<MainUIView> {
     }
 
     public void fetchKendaraan(){
-//        AppDB.getInstance(activity.getApplicationContext()).kendaraan().getAllRealTime().observe(lifecycleOwner, new Observer<List<Kendaraan>>() {
-//            @Override
-//            public void onChanged(List<Kendaraan> kendaraans) {
-//                getMvpView().listDataKendaraan(kendaraans);
-//            }
-//        });
-        Single.fromCallable(() -> AppDB.getInstance(activity.getApplicationContext()).kendaraan().getAll()).subscribe(new SingleSubscriber<List<Kendaraan>>() {
+        RxUtil.unSubscribe(mSubscription);
+        mSubscription = Single.fromCallable(() -> AppDB.getInstance(activity.getApplicationContext()).kendaraan().getAll()).subscribe(new SingleSubscriber<List<Kendaraan>>() {
             @Override
             public void onSuccess(List<Kendaraan> kendaraans) {
                 getMvpView().listDataKendaraan(kendaraans);
@@ -160,6 +151,15 @@ public class MainPresenter extends BasePresenter<MainUIView> {
                 getMvpView().listDataKendaraan(new ArrayList<>(), error);
             }
         });
+    }
+
+    public void validateKendaraanInput(EditText platNo, EditText tiketNo, int state){
+        if (platNo.getText().toString().isEmpty() && tiketNo.getText().toString().isEmpty()){
+            getMvpView().showError(platNo, "Tidak Boleh Kosong");
+            getMvpView().showError(tiketNo, "Tidak Boleh Kosong");
+        }else{
+            getMvpView().validated(state);
+        }
     }
 
     public void kendaraanMasuk(final Kendaraan kendaraan){
@@ -176,30 +176,82 @@ public class MainPresenter extends BasePresenter<MainUIView> {
                         getMvpView().kendaraanMasukGagal(kendaraan, error);
                     }
                 });
+//        mSubscription =
+//                Single.fromCallable((Callable<List<Kendaraan>>) () -> AppDB.getInstance(activity.getApplicationContext()).kendaraan().checkDuplicateKendaraan(kendaraan.getPlatNo(), kendaraan.getTiketNo()))
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(new SingleSubscriber<List<Kendaraan>>() {
+//                    @Override
+//                    public void onSuccess(List<Kendaraan> kendaraans) {
+//                        if (kendaraans.size() < 0){
+//                        }else{
+//                            getMvpView().kendaraanMasukGagal(kendaraan, new Throwable("Kendaraan " +
+//                                    "Sudah ada"));
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable error) {
+//                        getMvpView().kendaraanMasukGagal(kendaraan, error);
+//                    }
+//                });
+
     }
 
     public void kendaraanKeluar(final Kendaraan kendaraan){
         RxUtil.unSubscribe(mSubscription);
-        List<Kendaraan> existingKendaraan = new ArrayList<>();;
-        existingKendaraan = AppDB.getInstance(activity.getApplicationContext())
-                .kendaraan()
-                .getKendaraan(kendaraan.getPlatNo(), kendaraan.getTiketNo());
-        if (existingKendaraan.size() < 1){
-            getMvpView().kendaraanKeluarGagal(kendaraan, new Throwable("Kendaraan Not Found"));
-        }else{
-            kendaraan.setTimeOut(System.currentTimeMillis());
-            mSubscription = Single.fromCallable((Callable<Object>) () -> AppDB.getInstance(activity.getApplicationContext()).kendaraan().insert(kendaraan)).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new SingleSubscriber<Object>() {
-                        @Override
-                        public void onSuccess(Object o) {
-                            getMvpView().kendaraanKeluarSukses(kendaraan);
-                        }
+        mSubscription = Single.fromCallable(
+                () -> AppDB
+                        .getInstance(activity.getApplicationContext())
+                        .kendaraan()
+                        .getKendaraan(kendaraan.getPlatNo(), kendaraan.getTiketNo()))
+                .subscribe(new SingleSubscriber<List<Kendaraan>>() {
+                    @Override
+                    public void onSuccess(List<Kendaraan> kendaraans) {
+                        if (kendaraans.size() < 1){
+                            getMvpView().kendaraanKeluarGagal(kendaraan, new Throwable("Kendaraan Not Found"));
+                        }else{
+                            kendaraan.setTimeOut(System.currentTimeMillis());
+                            mSubscription = Single.fromCallable((Callable<Object>) () -> AppDB.getInstance(activity.getApplicationContext()).kendaraan().insert(kendaraan)).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+                                    .subscribe(new SingleSubscriber<Object>() {
+                                        @Override
+                                        public void onSuccess(Object o) {
+                                            getMvpView().kendaraanKeluarSukses(kendaraan);
+                                        }
 
-                        @Override
-                        public void onError(Throwable error) {
-                            getMvpView().kendaraanKeluarGagal(kendaraan, error);
+                                        @Override
+                                        public void onError(Throwable error) {
+                                            getMvpView().kendaraanKeluarGagal(kendaraan, error);
+                                        }
+                                    });
                         }
-                    });
+                    }
+
+                    @Override
+                    public void onError(Throwable error) {
+                        getMvpView().kendaraanKeluarGagal(kendaraan, error);
+                    }
+                });
+//        List<Kendaraan> existingKendaraan = new ArrayList<>();;
+//        existingKendaraan = AppDB.getInstance(activity.getApplicationContext())
+//                .kendaraan()
+//                .getKendaraan(kendaraan.getPlatNo(), kendaraan.getTiketNo());
+//        if (existingKendaraan.size() < 1){
+//            getMvpView().kendaraanKeluarGagal(kendaraan, new Throwable("Kendaraan Not Found"));
+//        }else{
+//            kendaraan.setTimeOut(System.currentTimeMillis());
+//            mSubscription = Single.fromCallable((Callable<Object>) () -> AppDB.getInstance(activity.getApplicationContext()).kendaraan().insert(kendaraan)).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+//                    .subscribe(new SingleSubscriber<Object>() {
+//                        @Override
+//                        public void onSuccess(Object o) {
+//                            getMvpView().kendaraanKeluarSukses(kendaraan);
+//                        }
+//
+//                        @Override
+//                        public void onError(Throwable error) {
+//                            getMvpView().kendaraanKeluarGagal(kendaraan, error);
+//                        }
+//                    });
 //            AppDB.getInstance(activity.getApplicationContext())
 //                    .kendaraan()
 //                    .insert(kendaraan)
@@ -217,6 +269,7 @@ public class MainPresenter extends BasePresenter<MainUIView> {
 //                        }
 //                    });
 //
-        }
+//        }
+
     }
 }

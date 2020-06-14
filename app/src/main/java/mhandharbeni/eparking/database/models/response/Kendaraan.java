@@ -1,11 +1,12 @@
 package mhandharbeni.eparking.database.models.response;
 
 import androidx.room.Entity;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
-@Entity
+@Entity(indices = { @Index(value = {"platNo", "tiketNo"}, unique = true) })
 public class Kendaraan {
     @PrimaryKey(autoGenerate = true)
     private Integer id;
