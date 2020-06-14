@@ -215,6 +215,13 @@ public class MainActivity extends BaseActivity implements MainUIView, KendaraanA
                 mainPresenter.kendaraanMasuk(kendaraan);
                 break;
             case Constant.STATE_VALIDATED_KELUAR :
+                Kendaraan kendaraanKeluar = new Kendaraan();
+                kendaraanKeluar.setPlatNo(platNo.getEditText().getText().toString());
+                kendaraanKeluar.setTiketNo(tiketNo.getEditText().getText().toString());
+                kendaraanKeluar.setDateNow(System.currentTimeMillis());
+                kendaraanKeluar.setTimeIn(System.currentTimeMillis());
+
+                mainPresenter.kendaraanKeluar(kendaraanKeluar);
                 break;
         }
     }
@@ -230,6 +237,7 @@ public class MainActivity extends BaseActivity implements MainUIView, KendaraanA
 
     @Override
     public void onKeluarClicked(Kendaraan kendaraan) {
-
+        kendaraan.setTimeOut(System.currentTimeMillis());
+        mainPresenter.kendaraanKeluar(kendaraan);
     }
 }
