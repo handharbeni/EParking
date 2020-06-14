@@ -176,26 +176,6 @@ public class MainPresenter extends BasePresenter<MainUIView> {
                         getMvpView().kendaraanMasukGagal(kendaraan, error);
                     }
                 });
-//        mSubscription =
-//                Single.fromCallable((Callable<List<Kendaraan>>) () -> AppDB.getInstance(activity.getApplicationContext()).kendaraan().checkDuplicateKendaraan(kendaraan.getPlatNo(), kendaraan.getTiketNo()))
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(new SingleSubscriber<List<Kendaraan>>() {
-//                    @Override
-//                    public void onSuccess(List<Kendaraan> kendaraans) {
-//                        if (kendaraans.size() < 0){
-//                        }else{
-//                            getMvpView().kendaraanMasukGagal(kendaraan, new Throwable("Kendaraan " +
-//                                    "Sudah ada"));
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onError(Throwable error) {
-//                        getMvpView().kendaraanMasukGagal(kendaraan, error);
-//                    }
-//                });
-
     }
 
     public void kendaraanKeluar(final Kendaraan kendaraan){
@@ -232,44 +212,6 @@ public class MainPresenter extends BasePresenter<MainUIView> {
                         getMvpView().kendaraanKeluarGagal(kendaraan, error);
                     }
                 });
-//        List<Kendaraan> existingKendaraan = new ArrayList<>();;
-//        existingKendaraan = AppDB.getInstance(activity.getApplicationContext())
-//                .kendaraan()
-//                .getKendaraan(kendaraan.getPlatNo(), kendaraan.getTiketNo());
-//        if (existingKendaraan.size() < 1){
-//            getMvpView().kendaraanKeluarGagal(kendaraan, new Throwable("Kendaraan Not Found"));
-//        }else{
-//            kendaraan.setTimeOut(System.currentTimeMillis());
-//            mSubscription = Single.fromCallable((Callable<Object>) () -> AppDB.getInstance(activity.getApplicationContext()).kendaraan().insert(kendaraan)).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-//                    .subscribe(new SingleSubscriber<Object>() {
-//                        @Override
-//                        public void onSuccess(Object o) {
-//                            getMvpView().kendaraanKeluarSukses(kendaraan);
-//                        }
-//
-//                        @Override
-//                        public void onError(Throwable error) {
-//                            getMvpView().kendaraanKeluarGagal(kendaraan, error);
-//                        }
-//                    });
-//            AppDB.getInstance(activity.getApplicationContext())
-//                    .kendaraan()
-//                    .insert(kendaraan)
-//                    .subscribeOn(Schedulers.io())
-//                    .observeOn(AndroidSchedulers.mainThread())
-//                    .subscribe(new Action0() {
-//                        @Override
-//                        public void call() {
-//                            getMvpView().kendaraanKeluarSukses(kendaraan);
-//                        }
-//                    }, new Action1<Throwable>() {
-//                        @Override
-//                        public void call(Throwable throwable) {
-//                            getMvpView().kendaraanKeluarGagal(kendaraan, throwable);
-//                        }
-//                    });
-//
-//        }
 
     }
 }
